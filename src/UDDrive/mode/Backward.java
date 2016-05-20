@@ -27,27 +27,27 @@ import com.pi4j.io.gpio.RaspiPin;
  */
 public class Backward {
 
-//    private final GpioController gpio;
-//    
-//    private final Pin backwardPin = RaspiPin.GPIO_26;
-//
-//    private final GpioPinPwmOutput backward;
-//            
-//
-//    public Backward(GpioController gpio) {
-//        this.gpio = gpio;
-//        this.backward = gpio.provisionPwmOutputPin(backwardPin);
-//
-//    }
-//
-//    private boolean BackwardAction(int speed) {
-//        boolean isDone = false;
-//        backward.setPwm(speed);
-//        return isDone = true;
-//    }
-//
-//    public void setSpeed(int speed) {
-//        BackwardAction(speed);
-//    }
+    private final GpioController gpio;
+    
+    private final Pin backwardPin = RaspiPin.GPIO_26;
+
+    private final GpioPinPwmOutput backward;
+            
+
+    public Backward(GpioController gpio) {
+        this.gpio = gpio;
+        this.backward = gpio.provisionPwmOutputPin(backwardPin);
+
+    }
+
+    private boolean BackwardAction(int speed) {
+        boolean isDone = false;
+        backward.setPwm(speed);
+        return isDone = true;
+    }
+
+    public void setSpeed(int speed) {
+        BackwardAction(speed);
+    }
 
 }
