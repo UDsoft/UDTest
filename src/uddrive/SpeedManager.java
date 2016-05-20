@@ -40,7 +40,7 @@ public class SpeedManager implements Runnable {
     private final GpioController gpio = GpioFactory.getInstance();
 
     private final Pin forwardPin = RaspiPin.GPIO_01;
-    private final Pin reversePin = RaspiPin.GPIO_12;
+    private final Pin reversePin = RaspiPin.GPIO_26;
 
     private final GpioPinPwmOutput forward
             = gpio.provisionPwmOutputPin(forwardPin);
