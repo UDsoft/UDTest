@@ -7,8 +7,10 @@ package uddrive;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import iot.DateTime;
 import java.util.concurrent.BlockingQueue;
@@ -41,11 +43,22 @@ public class SpeedManager implements Runnable {
 
     private final Pin forwardPin = RaspiPin.GPIO_01;
     private final Pin reversePin = RaspiPin.GPIO_26;
+    
+    /**Due to error in making only one of the pin to react as the PWM provider 
+     * this pins are created to be the logic in the hardware side to enable the 
+     * voltage flow by being high to allow the flow and low to block using the 
+     * npn transistor.
+     */
+    
+    private final Pin forwardLogic = RaspiPin.GPIO_04;
 
     private final GpioPinPwmOutput forward
             = gpio.provisionPwmOutputPin(forwardPin);
     private final GpioPinPwmOutput reverse
             = gpio.provisionPwmOutputPin(reversePin);
+    
+    private final GpioPinDigitalOutput okForward = 
+            gpio.provisionDigitalOutputPin(forwardLogic);
 
     //The current ID in process
     String ID;
@@ -105,6 +118,7 @@ public class SpeedManager implements Runnable {
          */
         forward.setPwm(0);
         reverse.setPwm(0);
+        okForward.low();
 
         /**
          * Thread is set to be inactive for 2 seconds for the complete braking
@@ -123,6 +137,7 @@ public class SpeedManager implements Runnable {
     }
 
     private void Forward(int speed) {
+        okForward.high();
         forward.setPwm(speed);
         isMovingForward = true;
         inStatic = false;
@@ -138,7 +153,7 @@ public class SpeedManager implements Runnable {
     }
 
     private void Reverse(int speed) {
-
+        okForward.low();
         System.out.println("Reverse activeby ID " + ID + " at " + dateTime.getTimeFormated());
         reverse.setPwm(speed);
         isMovingForward = false;
