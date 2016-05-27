@@ -6,7 +6,6 @@
 package uddrive;
 
 
-import com.pi4j.wiringpi.SoftPwm;
 import iot.DateTime;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -29,11 +28,12 @@ public class SpeedManager implements Runnable {
     DateTime dateTime = new DateTime();
 
     ThreadDataAnalyser dataAnalyser = new ThreadDataAnalyser(":");
+    
+    SoftwarePWM forward = new SoftwarePWM(1, 0, 100);
+    SoftwarePWM reverse = new SoftwarePWM(23, 0, 100);
 
     //The current ID in process
     String ID;
-    int forwardPin;
-    int reversePin;
 
     //Contructor for this class.
     public SpeedManager(BlockingQueue q) {
@@ -44,13 +44,9 @@ public class SpeedManager implements Runnable {
      * initialize the Logic function.
      */
     private void init() {
-        forwardPin = 1;
-        reversePin = 23;
         inStatic = true;
         isMovingForward = false;
         previousSpeed = 0;
-        SoftPwm.softPwmCreate(forwardPin, 0, 100);
-        SoftPwm.softPwmCreate(reversePin, 0, 100);
     }
 
     private void inAction() {
@@ -91,8 +87,8 @@ public class SpeedManager implements Runnable {
          * value is not stored in the respective pin. IF this is not taken care
          * , there will be in accuracy in the action given to the car.
          */
-        SoftPwm.softPwmWrite(forwardPin, 0);
-        SoftPwm.softPwmWrite(reversePin, 0);
+        forward.setValue(0);
+        reverse.setValue(0);
 
         /**
          * Thread is set to be inactive for 2 seconds for the complete braking
@@ -112,7 +108,7 @@ public class SpeedManager implements Runnable {
 
     private void Forward(int speed) {
         System.out.println("Forward active by ID " + ID + " at " + dateTime.getTimeFormated());
-        SoftPwm.softPwmWrite(forwardPin, speed);
+        forward.setValue(speed);
         isMovingForward = true;
         inStatic = false;
         try {
@@ -128,7 +124,7 @@ public class SpeedManager implements Runnable {
 
     private void Reverse(int speed) {
         System.out.println("Reverse active by ID " + ID + " at " + dateTime.getTimeFormated());
-        SoftPwm.softPwmWrite(reversePin, speed);
+        reverse.setValue(speed);
         isMovingForward = false;
         inStatic = false;
         try {
