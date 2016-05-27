@@ -58,7 +58,7 @@ public class SteeringManager implements Runnable {
 
     private final GpioController gpio = GpioFactory.getInstance();
 
-    private final Pin leftSteeringPin = RaspiPin.GPIO_23;
+    private final Pin leftSteeringPin = RaspiPin.GPIO_26;
     private final Pin rightSteeringPin = RaspiPin.GPIO_24;
 
     private final GpioPinPwmOutput leftSteering

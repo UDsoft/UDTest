@@ -37,7 +37,7 @@ public class UDDrive {
          */
         int port = 8000;
         
-        int factor = 100;
+        int factor = 1;
 
         /**
          * This BlockingQueue will be the storage point for all the data coming
