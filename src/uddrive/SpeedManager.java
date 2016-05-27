@@ -5,11 +5,8 @@
  */
 package uddrive;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.RaspiPin;
+
+import com.pi4j.wiringpi.SoftPwm;
 import iot.DateTime;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -20,49 +17,40 @@ import java.util.logging.Logger;
  * @author darwin
  */
 public class SpeedManager implements Runnable {
-    //Data collection
-//     private final BlockingQueue<String> dataqueue = 
-//         new LinkedBlockingQueue<>();  
 
     private final BlockingQueue queue;
-
     //Condition 
     private boolean inStatic;      //not Moving 
     private boolean isMovingForward;// is moving Forward direction.
 
     //store value
-    private int previousSpeed = 0;
+    private int previousSpeed;
 
     DateTime dateTime = new DateTime();
 
     ThreadDataAnalyser dataAnalyser = new ThreadDataAnalyser(":");
 
-    private final GpioController gpio = GpioFactory.getInstance();
-
-    private final Pin forwardPin = RaspiPin.GPIO_01;
-    private final Pin reversePin = RaspiPin.GPIO_12;
-
-    private final GpioPinPwmOutput forward
-            = gpio.provisionPwmOutputPin(forwardPin);
-    private final GpioPinPwmOutput reverse
-            = gpio.provisionPwmOutputPin(reversePin);
-
     //The current ID in process
     String ID;
-//    long startTime;
-//    long endTime;
+    int forwardPin;
+    int reversePin;
 
+    //Contructor for this class.
     public SpeedManager(BlockingQueue q) {
         this.queue = q;
-        init();
     }
 
     /**
      * initialize the Logic function.
      */
     private void init() {
-        this.inStatic = true;
-        this.isMovingForward = false;
+        forwardPin = 1;
+        reversePin = 23;
+        inStatic = true;
+        isMovingForward = false;
+        previousSpeed = 0;
+        SoftPwm.softPwmCreate(forwardPin, 0, 100);
+        SoftPwm.softPwmCreate(reversePin, 0, 100);
     }
 
     private void inAction() {
@@ -103,8 +91,8 @@ public class SpeedManager implements Runnable {
          * value is not stored in the respective pin. IF this is not taken care
          * , there will be in accuracy in the action given to the car.
          */
-        forward.setPwm(0);
-        reverse.setPwm(0);
+        SoftPwm.softPwmWrite(forwardPin, 0);
+        SoftPwm.softPwmWrite(reversePin, 0);
 
         /**
          * Thread is set to be inactive for 2 seconds for the complete braking
@@ -123,7 +111,8 @@ public class SpeedManager implements Runnable {
     }
 
     private void Forward(int speed) {
-        forward.setPwm(speed);
+        System.out.println("Forward active by ID " + ID + " at " + dateTime.getTimeFormated());
+        SoftPwm.softPwmWrite(forwardPin, speed);
         isMovingForward = true;
         inStatic = false;
         try {
@@ -138,9 +127,8 @@ public class SpeedManager implements Runnable {
     }
 
     private void Reverse(int speed) {
-
-        System.out.println("Reverse activeby ID " + ID + " at " + dateTime.getTimeFormated());
-        reverse.setPwm(speed);
+        System.out.println("Reverse active by ID " + ID + " at " + dateTime.getTimeFormated());
+        SoftPwm.softPwmWrite(reversePin, speed);
         isMovingForward = false;
         inStatic = false;
         try {
