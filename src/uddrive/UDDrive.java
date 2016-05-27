@@ -37,7 +37,7 @@ public class UDDrive {
          */
         int port = 8000;
         
-        int factor = 1;
+        int factor = 100;
 
         /**
          * This BlockingQueue will be the storage point for all the data coming
@@ -73,7 +73,7 @@ public class UDDrive {
                     analyse.setData(data);
                     if (analyse.getCommand().equals("MC")) {
                         int steering = analyse.getSteeringInt()*factor;
-                        int speed = analyse.getSpeedInt()*factor;
+                        int speed = analyse.getSpeedInt();
                         String ID = analyse.getID();
                         String speedData = ID + ":" + speed;
                         String steeringData = ID + ":" + steering;
